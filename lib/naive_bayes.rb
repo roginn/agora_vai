@@ -1,7 +1,7 @@
 #encoding: utf-8
-require 'rubygems'
-require "bundler/setup"
-require 'stemmer'
+# require 'rubygems'
+# require "bundler/setup"
+# require 'stemmer'
 
 class NaiveBayes
 
@@ -81,7 +81,7 @@ class NaiveBayes
   # the probability of a word in this category
   # uses a weighted probability in order not to have zero probabilities
   def word_probability(category, word)
-    (@words[category][word.stem].to_f + 1)/@categories_words[category].to_f
+    (@words[category][word].to_f + 1)/@categories_words[category].to_f
   end
 
   def unknown_word?(word)
@@ -125,7 +125,7 @@ class NaiveBayes
     d = Hash.new
     words.each do |word|
       word.downcase!
-      key = word.stem
+      key = word
       unless @common_words.include?(word) # remove common words
         d[key] ||= 0
         d[key] += 1
