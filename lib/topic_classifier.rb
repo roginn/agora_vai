@@ -1,4 +1,5 @@
 # load 'naive_bayes.rb'
+require 'sqlite3'
 require 'yaml'
 
 class TopicClassifier
@@ -11,20 +12,35 @@ class TopicClassifier
     [/[çÇ]/, 'c']
   ]
 
-  STOP_WORDS_YAML = '../stop_words.yml'
 
   def initialize(categories = ['a', 'b'])
     @categories = categories
-    stop_words = YAML.load(File.read(STOP_WORDS_YAML))['stop_words'].map { |w| sanitize_text w }
+    stop_words_yaml = File.join($AGORA_VAI_ROOT, 'stop_words.yml')
+    stop_words = YAML.load(File.read(stop_words_yaml))['stop_words'].map { |w| sanitize_text w }
     @naive_bayes = NaiveBayes.new categories, stop_words
   end
 
+  # def train!
+  #   @categories.each do |category|
+  #     example = sanitize_text File.read("../data/#{category}.txt")
+  #     @naive_bayes.train category, example
+  #   end
+  #   @naive_bayes.filter_low_occurrences!
+  # end
+
   def train!
-    @categories.each do |category|
-      example = sanitize_text File.read("../data/#{category}.txt")
+    category_dictionary = {
+      "Análise Dimensional - Sistemas de Unidades" => "dimensional",
+      "Calorimetria" => "calorimetria"
+    }
+    @db = SQLite3::Database.new "questions.db"
+    records = @db.execute "select value, topic from questions;"
+    records.each do |(value, topic)|
+      example = sanitize_text value
+      category = category_dictionary[topic]
       @naive_bayes.train category, example
     end
-    @naive_bayes.filter_low_occurrences!
+
   end
 
   def sanitize_text(raw_text)
