@@ -17,8 +17,8 @@ class AgoraVai < Sinatra::Application
   post '/uploads/:filename' do
     userdir = File.join("uploads")
     FileUtils.mkdir_p(userdir)
-    filename = File.join(userdir, cleanup(params[:filename]))
-    datafile = cleanup(params[:data])
+    filename = File.join(userdir,params[:filename])
+    datafile = params[:data]
   #  "#{datafile[:tempfile].inspect}\n"
     File.open(filename, 'wb') do |file|
       file.write(datafile[:tempfile].read)
