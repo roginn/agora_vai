@@ -15,7 +15,7 @@ class TopicClassifier
 
   def initialize(categories = ['a', 'b'])
     @categories = categories
-    stop_words_yaml = File.join($AGORA_VAI_ROOT, 'stop_words.yml')
+    stop_words_yaml = File.join($AGORA_VAI_HOME, 'stop_words.yml')
     stop_words = YAML.load(File.read(stop_words_yaml))['stop_words'].map { |w| sanitize_text w }
     @naive_bayes = NaiveBayes.new categories, stop_words
   end
