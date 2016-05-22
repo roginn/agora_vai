@@ -3,23 +3,20 @@ require 'rubygems'
 require 'sinatra'
 require 'fileutils'
 require 'pry'
-load '../lib/naive_bayes.rb'
-load '../lib/topic_classifier.rb'
 
 class AgoraVai < Sinatra::Application
   AGORA_VAI_HOME = File.expand_path(File.join('..', File.dirname(__FILE__)))
+
 
   get '/' do
     'PEIXE ESTEVE AQUI CARAJO!'
   end
 
-
- 
   # upload with:
   # curl -v -F "data=@/path/to/filename"  http://localhost:4567/uploads/filename
   #escreve arquivo em agora_vai/uploads/filename
   post '/uploads/:filename' do
-    userdir = File.join(AGORA_VAI_HOME, "uploads")
+    userdir = File.join($AGORA_VAI_ROOT, "uploads")
     FileUtils.mkdir_p(userdir) unless Dir.exists?(userdir)
     filename = File.join(userdir,params[:filename])
     datafile = params[:data]
@@ -40,7 +37,7 @@ class AgoraVai < Sinatra::Application
 
 
   def predict(text)
-    tc = TopicClassifier.new
+    tc = TopicClassifier.new(['dimensional', 'calorimetria'])
     tc.guess_class(text)
   end
 
