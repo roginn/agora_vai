@@ -43,7 +43,18 @@ class AgoraVai < Sinatra::Application
 
 
   def predict(text)
-    tc = TopicClassifier.new(['dimensional', 'calorimetria'])
+    tc = TopicClassifier.new %w{
+      calorimetria
+      dimensional
+      eletricidade
+      magnetismo
+      mecanica
+      moderna
+      ondulatoria
+      optica
+    }
+    tc.train!
+    # tc.score(text).to_s
     tc.guess_class(text)
   end
 

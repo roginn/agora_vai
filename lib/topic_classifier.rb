@@ -29,18 +29,12 @@ class TopicClassifier
   # end
 
   def train!
-    category_dictionary = {
-      "Análise Dimensional - Sistemas de Unidades" => "dimensional",
-      "Calorimetria" => "calorimetria"
-    }
-    @db = SQLite3::Database.new "questions.db"
+    @db = SQLite3::Database.new(File.join $AGORA_VAI_HOME, "questions.db")
     records = @db.execute "select value, topic from questions;"
     records.each do |(value, topic)|
       example = sanitize_text value
-      category = category_dictionary[topic]
-      @naive_bayes.train category, example
+      @naive_bayes.train topic, example
     end
-
   end
 
   def sanitize_text(raw_text)
@@ -57,7 +51,7 @@ class TopicClassifier
   end
 
   def guess_class(text)
-    scores = score(text)
+    scores = score(text).select { |k, v| v < 0 } # eliminates Infinity
     scores.sort_by { |k, v| -v }[0][0]
   end
 end
