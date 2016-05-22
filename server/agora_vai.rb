@@ -3,6 +3,7 @@ require 'rubygems'
 require 'sinatra'
 require 'fileutils'
 require 'pry'
+require 'base64'
 require_relative '../lib/naive_bayes.rb'
 require_relative '../lib/topic_classifier.rb'
 
@@ -27,7 +28,7 @@ class AgoraVai < Sinatra::Application
     datafile = params[:data]
   #  "#{datafile[:tempfile].inspect}\n"
     File.open(filename, 'wb') do |file|
-      file.write(datafile[:tempfile].read)
+      file.write(Base64.decode64(datafile))
     end
 
     # mandando o tesseract cuspir o resultado
