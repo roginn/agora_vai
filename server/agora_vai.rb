@@ -1,7 +1,7 @@
 require 'sinatra/base'
 require 'rubygems'
 require 'sinatra'
-require 'haml'
+require 'fileutils'
 
 
 class AgoraVai < Sinatra::Application
@@ -11,17 +11,19 @@ class AgoraVai < Sinatra::Application
 
 
  
-# Handle GET-request (Show the upload form)
-get "/upload" do
-  haml :upload
-end      
-    
-# Handle POST-request (Receive and save the uploaded file)
-post "/upload" do 
-  File.open('uploads/' + params['myfile'][:filename], "w") do |f|
-    f.write(params['myfile'][:tempfile].read)
+# upload with:
+# curl -v -F "data=@/path/to/filename"  http://localhost:4567/user/filename
+
+post '/:name/:filename' do
+  userdir = File.join("files", params[:name])
+  FileUtils.mkdir_p(userdir)
+  filename = File.join(userdir, params[:filename])
+  datafile = params[:data]
+#  "#{datafile[:tempfile].inspect}\n"
+  File.open(filename, 'wb') do |file|
+    file.write(datafile[:tempfile].read)
   end
-  return "The file was successfully uploaded!"
+  "wrote to #{filename}\n"
 end
 
 
