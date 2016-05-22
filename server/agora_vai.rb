@@ -11,7 +11,8 @@ require_relative '../lib/topic_classifier.rb'
 
 class AgoraVai < Sinatra::Application
 
-  AGORA_VAI_HOME = File.expand_path(File.join('..', File.dirname(__FILE__)))
+  # AGORA_VAI_HOME = File.expand_path(File.join('..', File.dirname(__FILE__)))
+  AGORA_VAI_HOME = '/home/ubuntu/agora_vai'
 
   get '/' do
     'ALL HAIL ETEVALDO'
