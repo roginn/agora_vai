@@ -12,40 +12,40 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="Bem vindo ao AgoraVai! Tire uma foto e pressiona AGORA VAI para saber o tópico"
         android:id="@+id/textView" />
 
     <ImageView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/imageView1"
-        android:layout_below="@+id/textView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="33dp" />
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="CAPTURAR IMAGEM"
         android:id="@+id/button"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="captureImage" />
+        android:onClick="takePicture"
+        android:layout_above="@+id/button2"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="AGORA VAI"
         android:id="@+id/button2"
-        android:layout_marginTop="31dp"
-        android:layout_below="@+id/button"
-        android:layout_centerHorizontal="true"
-        android:onClick="sendImage"/>
+        android:onClick="sendImage"
+        android:layout_above="@+id/textView2"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
+        android:text="..."
         android:id="@+id/textView2"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
