@@ -15,7 +15,7 @@ class AgoraVai < Sinatra::Application
 # curl -v -F "data=@/path/to/filename"  http://localhost:4567/user/filename
 #escreve arquivo em agora_vai/files/name/filename
 post '/uploads/:filename' do
-  userdir = File.join("files", uploads)
+  userdir = File.join("uploads")
   FileUtils.mkdir_p(userdir)
   filename = File.join(userdir, params[:filename])
   datafile = params[:data]
