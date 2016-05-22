@@ -13,11 +13,9 @@ class AgoraVai < Sinatra::Application
  
 # upload with:
 # curl -v -F "data=@/path/to/filename"  http://localhost:4567/user/filename
-
-
 #escreve arquivo em agora_vai/files/name/filename
-post '/:name/:filename' do
-  userdir = File.join("files", params[:name])
+post '/uploads/:filename' do
+  userdir = File.join("files", uploads)
   FileUtils.mkdir_p(userdir)
   filename = File.join(userdir, params[:filename])
   datafile = params[:data]
@@ -25,14 +23,6 @@ post '/:name/:filename' do
   File.open(filename, 'wb') do |file|
     file.write(datafile[:tempfile].read)
   end
-
-  #tesseract com imagem
-
-
-
-  #faz o naivebayes
-
-
   "wrote to #{filename}\n"
 end
 
