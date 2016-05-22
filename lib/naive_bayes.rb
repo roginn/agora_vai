@@ -5,8 +5,13 @@ require 'stemmer'
 
 class NaiveBayes
 
+  attr_accessor :words, :categories_documents, :categories_words
+
   # provide a list of categories for this classifier
-  def initialize(categories)
+  def initialize(categories, common_words = COMMON_WORDS)
+    @common_words = common_words
+    @categories = categories
+
     # keeps a hash of word count for each category
     @words = Hash.new
     @total_words = 0
@@ -63,6 +68,14 @@ class NaiveBayes
     return pretty
   end
 
+  def filter_low_occurrences!(threshold = 1)
+    @words.each_pair do |category, words_hash|
+      words_hash.each_pair do |word, count|
+        @words[category].delete(word) if count <= threshold
+      end
+    end
+  end
+
   private
 
   # the probability of a word in this category
@@ -71,11 +84,25 @@ class NaiveBayes
     (@words[category][word.stem].to_f + 1)/@categories_words[category].to_f
   end
 
+  def unknown_word?(word)
+    @categories.none? { |cat| @words[cat].has_key? word }
+  end
+
   # the probability of a document in this category
   # this is just the cumulative multiplication of all the word probabilities for this category
   def doc_probability(category, document)
-    doc_prob = 1
-    word_count(document).each { |word| doc_prob *= word_probability(category, word[0]) }
+    doc_prob = 0
+    # word_count(document).each { |word| doc_prob *= (word_probability(category, word[0]) + 1e-4) }
+    word_count(document).each do |word|
+      if unknown_word?(word[0])
+        # puts "not found: #{word[0]}"
+        next
+      else
+        # puts "FOUND! #{word[0]}"
+      end
+      # binding.pry
+      doc_prob += Math.log word_probability(category, word[0])
+    end
     return doc_prob
   end
 
@@ -87,7 +114,9 @@ class NaiveBayes
 
   # the un-normalized probability of that this document belongs to this category
   def probability(category, document)
-    doc_probability(category, document) * category_probability(category)
+    # binding.pry
+    # doc_probability(category, document) * category_probability(category)
+    doc_probability(category, document)
   end
 
   # get a hash of the number of times a word appears in any document
@@ -97,7 +126,7 @@ class NaiveBayes
     words.each do |word|
       word.downcase!
       key = word.stem
-      unless COMMON_WORDS.include?(word) # remove common words
+      unless @common_words.include?(word) # remove common words
         d[key] ||= 0
         d[key] += 1
       end
