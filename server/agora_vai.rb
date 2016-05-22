@@ -11,10 +11,8 @@ class AgoraVai < Sinatra::Application
   $AGORA_VAI_HOME = File.expand_path(File.join('..', File.dirname(__FILE__)))
 
   get '/' do
-    'PEIXE ESTEVE AQUI CARAJO!'
+    'ALL HAIL ETEVALDO'
   end
-
-
 
   # upload with:
   # curl -v -F "data=@/path/to/filename"  http://localhost:4567/uploads/filename
@@ -36,7 +34,7 @@ class AgoraVai < Sinatra::Application
     output = %x(cat output.txt)
 
     logger.info output.inspect
-    output
+    "#{predict(output)}\n"
   end
 
   post '/naive_bayes' do
