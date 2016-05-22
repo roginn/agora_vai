@@ -3,6 +3,7 @@ package redealumni.agoravai;
 import com.loopj.android.http.*;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.StrictMode;
@@ -15,29 +16,29 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.mime.content.ContentBody;
+import cz.msebera.android.httpclient.entity.mime.content.InputStreamBody;
 
 
 public class MainActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imageView;
     private TextView txtView;
-    private Uri mImageCaptureUri;
-    private Uri fileUri;
-    public static final int MEDIA_TYPE_IMAGE = 1;
-    public static final int MEDIA_TYPE_VIDEO = 2;
     private String fileName = Environment.getExternalStorageDirectory() + File.separator + "temp.png";
     String mCurrentPhotoPath;
-
-
+    static final int REQUEST_TAKE_PHOTO = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,20 +49,35 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    //*
     public void captureImage(View view) {
         //Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         //startActivityForResult(cameraIntent, CAMERA_REQUEST);
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, CAMERA_REQUEST);
-    }
+    }//*/
     /*******************************************
      *
      * na vdd essa porra e so o thumbnail
      * *****************************************/
 
+    public static long getFolderSize(File f) {
+        long size = 0;
+        if (f.isDirectory()) {
+            for (File file : f.listFiles()) {
+                size += getFolderSize(file);
+            }
+        } else {
+            size=f.length();
+        }
+        return size;
+    }
+
+
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             //Bitmap photo = (Bitmap) data.get;
@@ -77,20 +93,27 @@ public class MainActivity extends AppCompatActivity {
                 out.close();
             } catch (Exception e) {
                 txtView.setText("FAIL: "+e);
-            }//*/
+            }
+
+            txtView.setText("THUMB IMAGE SAVED TO : "+ fileName);
+        }
+
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK)
+        {
+            String value=null;
+            long Filesize=getFolderSize(new File(fileName))/1024;//call function and convert bytes into Kb
+            if(Filesize>=1024)
+                value=Filesize/1024+" Mb";
+            else
+                value=Filesize+" Kb";
+
+            txtView.setText("FULL IMAGE SAVED TO: "+ fileName + " of size " +value);
 
 
-
-            txtView.setText("IMAGE SAVED TO : "+ fileName);
+            Bitmap myBitmap = BitmapFactory.decodeFile(fileName);
+            imageView.setImageBitmap(myBitmap);
         }
     }
-
-
-
-
-
-
-
 
 
 
@@ -101,8 +124,11 @@ public class MainActivity extends AppCompatActivity {
      *******************************************/
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        //String imageFileName = "JPEG_" + timeStamp + "_";
+
+        String imageFileName= "mondai";
+
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
@@ -112,34 +138,41 @@ public class MainActivity extends AppCompatActivity {
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        mCurrentPhotoPath = image.getAbsolutePath();
+
+
         return image;
     }
 
-    static final int REQUEST_TAKE_PHOTO = 1;
 
-    private void dispatchTakePictureIntent(View view) {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
+
+    public void takePicture(View view)
+    {
+
+        txtView.setText("pow");
+        ///*
+        try {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-                txtView.setText(ex.toString());
-            }
+            //photoFile = createImageFile();
+
+            photoFile = new File(fileName);
+
+
+            txtView.setText("WILL SAVE IMAGE ON: "+ fileName);
+
+
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        Uri.fromFile(photoFile));
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
-        }
+        } catch (Exception ex) {
+            // Error occurred while creating the File
+            txtView.setText(ex.toString());
+        }//*/
 
-        //txtView.setText("IMAGE SAVED TO : "+ mCurrentPhotoPath);
-    }
+    } // public void takePicture(View view)
 
 
 
@@ -161,26 +194,45 @@ public class MainActivity extends AppCompatActivity {
      *******************************************/
     public void sendImage(View view) {
 
-        txtView.setText("ok, tentando conectar no servidor...");
+        txtView.setText("...");
         enableStrictMode(); //acochambracao master
 
         try {
             AsyncHttpClient client = new AsyncHttpClient();
             RequestParams params = new RequestParams();
 
-            File myFile = new File(fileName);
-            //params.add("data", "@" + fileName);
-            params.put("data", myFile);
+            //File myFile = new File(mCurrentPhotoPath);
+            //File myFile = new File(fileName);
+            String jpegFileName = Environment.getExternalStorageDirectory() + File.separator + "temp.jpg";
+            File jpegFile = new File(jpegFileName);
+            Bitmap bmp = BitmapFactory.decodeFile(fileName);
+            FileOutputStream fos = new FileOutputStream(jpegFile);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 70, fos);
+            fos.flush();
+            fos.close();
+
+
+
+            String value=null;
+            long Filesize=getFolderSize(jpegFile)/1024;//call function and convert bytes into Kb
+            if(Filesize>=1024)
+                value=Filesize/1024+" Mb";
+            else
+                value=Filesize+" Kb";
+
+            txtView.setText("Sending compressed image of size " +value + "...");
+
+            params.put("data", jpegFile);
             client.post("http://agoravai.querobolsa.space/uploads/file", params,new AsyncHttpResponseHandler()
             {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                    txtView.setText("success!!!!");
+                    txtView.setText("WIN: " + new String(responseBody));
                 }
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                   txtView.setText("FAIL");
+                   txtView.setText("FAIL: " + new String(responseBody));
                 }
             }
             );

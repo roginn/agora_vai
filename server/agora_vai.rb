@@ -24,6 +24,11 @@ class AgoraVai < Sinatra::Application
       file.write(datafile[:tempfile].read)
     end
     "wrote to #{filename}\n"
+
+    #facam o que quiserem com o arquivo aqui
+
+
+
   end
 
 
