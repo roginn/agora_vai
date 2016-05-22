@@ -14,7 +14,7 @@ class AgoraVai < Sinatra::Application
   end
 
 
- 
+
   # upload with:
   # curl -v -F "data=@/path/to/filename"  http://localhost:4567/uploads/filename
   #escreve arquivo em agora_vai/uploads/filename
@@ -30,7 +30,10 @@ class AgoraVai < Sinatra::Application
 
     # mandando o tesseract cuspir o resultado
     %x(tesseract -l por "#{filename}" output)
-    %x(cat output.txt)
+    output = %x(cat output.txt)
+
+    logger.info output.inspect
+    output
   end
 
   post '/naive_bayes' do
