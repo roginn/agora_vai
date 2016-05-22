@@ -3,8 +3,8 @@ require 'rubygems'
 require 'sinatra'
 require 'fileutils'
 require 'pry'
-load '../lib/naive_bayes.rb'
-load '../lib/topic_classifier.rb'
+require_relative '../lib/naive_bayes.rb'
+require_relative '../lib/topic_classifier.rb'
 
 class AgoraVai < Sinatra::Application
   AGORA_VAI_HOME = File.expand_path(File.join('..', File.dirname(__FILE__)))
