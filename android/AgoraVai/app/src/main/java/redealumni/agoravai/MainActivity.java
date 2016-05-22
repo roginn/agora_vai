@@ -206,8 +206,11 @@ public class MainActivity extends AppCompatActivity {
             String jpegFileName = Environment.getExternalStorageDirectory() + File.separator + "temp.jpg";
             File jpegFile = new File(jpegFileName);
             Bitmap bmp = BitmapFactory.decodeFile(fileName);
+            Bitmap resized = Bitmap.createScaledBitmap(bmp, 1600, 900, false);
+
+
             FileOutputStream fos = new FileOutputStream(jpegFile);
-            bmp.compress(Bitmap.CompressFormat.JPEG, 70, fos);
+            resized.compress(Bitmap.CompressFormat.JPEG, 70, fos);
             fos.flush();
             fos.close();
 
