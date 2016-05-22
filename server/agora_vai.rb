@@ -5,12 +5,13 @@ require 'fileutils'
 require 'pry'
 require 'base64'
 
-$AGORA_VAI_HOME = File.expand_path(File.join('..', File.dirname(__FILE__)))
 
 require_relative '../lib/naive_bayes.rb'
 require_relative '../lib/topic_classifier.rb'
 
 class AgoraVai < Sinatra::Application
+
+  AGORA_VAI_HOME = File.expand_path(File.join('..', File.dirname(__FILE__)))
 
   get '/' do
     'ALL HAIL ETEVALDO'
@@ -22,7 +23,7 @@ class AgoraVai < Sinatra::Application
   post '/uploads/:filename' do
     logger.info '*************************'
     logger.info params.inspect
-    userdir = File.join($AGORA_VAI_HOME, "uploads")
+    userdir = File.join(AGORA_VAI_HOME, "uploads")
     FileUtils.mkdir_p(userdir) unless Dir.exists?(userdir)
     filename = File.join(userdir,params[:filename])
     datafile = params[:data]
