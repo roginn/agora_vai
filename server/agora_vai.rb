@@ -11,20 +11,20 @@ class AgoraVai < Sinatra::Application
 
 
  
-# upload with:
-# curl -v -F "data=@/path/to/filename"  http://localhost:4567/user/filename
-#escreve arquivo em agora_vai/files/name/filename
-post '/uploads/:filename' do
-  userdir = File.join("uploads")
-  FileUtils.mkdir_p(userdir)
-  filename = File.join(userdir, params[:filename])
-  datafile = params[:data]
-#  "#{datafile[:tempfile].inspect}\n"
-  File.open(filename, 'wb') do |file|
-    file.write(datafile[:tempfile].read)
+  # upload with:
+  # curl -v -F "data=@/path/to/filename"  http://localhost:4567/uploads/filename
+  #escreve arquivo em agora_vai/uploads/filename
+  post '/uploads/:filename' do
+    userdir = File.join("uploads")
+    FileUtils.mkdir_p(userdir)
+    filename = File.join(userdir, cleanup(params[:filename]))
+    datafile = cleanup(params[:data])
+  #  "#{datafile[:tempfile].inspect}\n"
+    File.open(filename, 'wb') do |file|
+      file.write(datafile[:tempfile].read)
+    end
+    "wrote to #{filename}\n"
   end
-  "wrote to #{filename}\n"
-end
 
 
 
