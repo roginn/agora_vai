@@ -33,7 +33,8 @@ class AgoraVai < Sinatra::Application
     end
 
     # mandando o tesseract cuspir o resultado
-    %x(tesseract -l por "#{filename}" output)
+    %x(convert "#{filename}" -resize 400% -type Grayscale input.tif)
+    %x(tesseract -l por input.tif output)
     output = %x(cat output.txt)
 
     logger.info output.inspect
