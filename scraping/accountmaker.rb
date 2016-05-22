@@ -13,11 +13,26 @@ end
 
 nome = 'agoravai_' + SecureRandom.hex[0..5]
 email = nome + '@mailinator.com'
-password = SecureRandom.hex[0..6]
+password = SecureRandom.hex[0..9]
+create_password_link = '_BLANK_'
+running_result = 'error'
 
 puts "nome = #{nome}"
 puts "email = #{email}"
 puts "password = #{password}"
+
+def try_element(browser, timeout: WAIT_TIMEOUT)
+  puts 'Trying web element...'
+  puts " => Time.now: #{Time.now}"
+  begin
+    (yield browser).wait_until_present timeout
+  rescue Watir::Wait::TimeoutError
+    puts "Timed out in #{WAIT_TIMEOUT}s waiting for element"
+  ensure
+    puts " => Time.now: #{Time.now}"
+  end
+  (yield browser)
+end
 
 begin
   browser = Watir::Browser.new
@@ -34,27 +49,31 @@ begin
   window2 = browser.window(title: '')
   window2.use do
     browser.goto mailinator_url(nome)
-    puts " => Time.now: #{Time.now}"
-    browser.div(id: 'public_maildirdiv').div(text: MAIL_TITLE).wait_until_present WAIT_TIMEOUT
-    puts " => Time.now: #{Time.now}"
-    puts "Timed out in #{WAIT_TIMEOUT}s waiting for email"
-    browser.div(id: 'public_maildirdiv').div(text: MAIL_TITLE).click
-    create_password_link = browser.element(:css, '[href^="http://click1.clickrouter.com/redirect?token="]').href
+    email_link = try_element(browser) { |b| b.div(class: 'innermail', text: MAIL_TITLE) }
+    email_link.click
+    link = try_element(browser) do |b|
+      b.iframe(id: 'publicshowmaildivcontent').a(:css, '[href^="http://click1.clickrouter.com/redirect?token="]')
+    end
+    create_password_link = link.href
     puts "create_password_link = #{create_password_link}"
   end
   window2.close
 
   browser.goto create_password_link
-  browser.input(name: 'PASSWD').set nome
-  browser.input(name: 'CONF_PASSWD').set nome
+  browser.input(id: 'PASSWD').send_keys password
+  browser.input(id: 'CONF_PASSWD').send_keys password
   browser.input(name: 'entrar').click
+  running_result = 'success'
 ensure
+  browser.close rescue nil
+
   yaml = {
-    'name' => nome || '',
-    'email' => email || '',
-    'create_password_link' => create_password_link || '',
-    'password' => password || ''
+    'name' => nome,
+    'email' => email,
+    'create_password_link' => create_password_link,
+    'password' => password,
+    'running_result' => running_result
   }.to_yaml
 
-  File.open("account_#{nome}", 'w') { |file| file << yaml }
+  File.open("account_#{nome}.yml", 'w') { |file| file << yaml }
 end
