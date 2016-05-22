@@ -2,7 +2,7 @@ require 'sinatra/base'
 
 class AgoraVai < Sinatra::Application
   get '/' do
-    'Hello world!'
+    'PEIXE ESTEVE AQUI CARAJO!'
   end
 
   # start the server if ruby file executed directly
