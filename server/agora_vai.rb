@@ -4,11 +4,13 @@ require 'sinatra'
 require 'fileutils'
 require 'pry'
 require 'base64'
+
+$AGORA_VAI_HOME = File.expand_path(File.join('..', File.dirname(__FILE__)))
+
 require_relative '../lib/naive_bayes.rb'
 require_relative '../lib/topic_classifier.rb'
 
 class AgoraVai < Sinatra::Application
-  $AGORA_VAI_HOME = File.expand_path(File.join('..', File.dirname(__FILE__)))
 
   get '/' do
     'ALL HAIL ETEVALDO'
