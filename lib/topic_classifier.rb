@@ -12,7 +12,7 @@ class TopicClassifier
     [/[çÇ]/, 'c']
   ]
 
-  AGORA_VAI_HOME = File.expand_path(File.join('..', File.dirname(__FILE__)))
+  AGORA_VAI_HOME = File.expand_path('..')
 
   def initialize(categories = ['a', 'b'])
     @categories = categories
