@@ -30,12 +30,19 @@ begin
   browser.input(name: 'button', id: 'button2').click
   browser.alert.ok
 
-  browser.goto mailinator_url(nome)
-  browser.div(id: 'public_maildirdiv').div(text: MAIL_TITLE).wait_until_present WAIT_TIMEOUT
-  puts "Timed out in #{WAIT_TIMEOUT}s waiting for email"
-  browser.div(id: 'public_maildirdiv').div(text: MAIL_TITLE).click
-  create_password_link = browser.element(:css, '[href^="http://click1.clickrouter.com/redirect?token="]').href
-  puts "create_password_link = #{create_password_link}"
+  browser.execute_script('window.open()')
+  window2 = browser.window(title: '')
+  window2.use do
+    browser.goto mailinator_url(nome)
+    puts " => Time.now: #{Time.now}"
+    browser.div(id: 'public_maildirdiv').div(text: MAIL_TITLE).wait_until_present WAIT_TIMEOUT
+    puts " => Time.now: #{Time.now}"
+    puts "Timed out in #{WAIT_TIMEOUT}s waiting for email"
+    browser.div(id: 'public_maildirdiv').div(text: MAIL_TITLE).click
+    create_password_link = browser.element(:css, '[href^="http://click1.clickrouter.com/redirect?token="]').href
+    puts "create_password_link = #{create_password_link}"
+  end
+  window2.close
 
   browser.goto create_password_link
   browser.input(name: 'PASSWD').set nome
